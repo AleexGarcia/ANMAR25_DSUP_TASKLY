@@ -9,3 +9,5 @@ export const updateTaskSchema = z.object({
   category: z.nativeEnum(TaskCategory),
   id: z.number(),
 });
+
+export type UpdateTaskDto = z.infer<typeof updateTaskSchema>;
