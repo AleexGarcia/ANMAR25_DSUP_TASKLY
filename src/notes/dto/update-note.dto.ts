@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateNoteDto } from './create-note.dto';
+import { createNoteSchema } from './create-note.dto';
+import { z } from 'zod';
 
-export class UpdateNoteDto extends PartialType(CreateNoteDto) {}
+export type UpdateNoteDto = z.infer<typeof createNoteSchema>;
