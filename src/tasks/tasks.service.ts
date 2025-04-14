@@ -1,26 +1,49 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Task } from './entities/task.entity';
+import { Repository } from 'typeorm';
+import { TaskStatus } from 'src/common/enums/TaskStatus.enum';
+import { GetTaskQuery } from './dto/get-task-query.dto';
 
 @Injectable()
 export class TasksService {
-  create(createTaskDto: CreateTaskDto) {
-    return 'This action adds a new task';
+  constructor(
+    @InjectRepository(Task) private tasksRepository: Repository<Task>,
+  ) {}
+  async create(createTaskDto: CreateTaskDto) {
+    return this.tasksRepository.save(createTaskDto);
   }
 
-  findAll() {
-    return `This action returns all tasks`;
+  async findAll(query: GetTaskQuery) {
+    const whereOptional = {};
+    const { category, priority, status } = query;
+    if (category) {
+      Object.assign(whereOptional, { category: category });
+    }
+    if (priority) {
+      Object.assign(whereOptional, { priority: priority });
+    }
+    if (status) {
+      Object.assign(whereOptional, { status: status });
+    }
+    return this.tasksRepository.find({ where: whereOptional });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+  async findOne(id: number) {
+    return this.tasksRepository.findOne({ where: { id: id } });
   }
 
-  update(id: number, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
+  async update(id: number, updateTaskDto: UpdateTaskDto) {
+    return this.tasksRepository.update({ id: id }, updateTaskDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  async remove(id: number) {
+    return this.tasksRepository.delete({ id: id });
+  }
+
+  async findAllByStatus(status: TaskStatus) {
+    return this.tasksRepository.find({ where: { status: status } });
   }
 }
