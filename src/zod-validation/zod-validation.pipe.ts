@@ -4,7 +4,7 @@ import {
   BadRequestException,
   Injectable,
 } from '@nestjs/common';
-import { ZodSchema } from 'zod';
+import { ZodSchema, ZodError } from 'zod';
 
 @Injectable()
 export class ZodValidationPipe implements PipeTransform {
@@ -17,6 +17,10 @@ export class ZodValidationPipe implements PipeTransform {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return parsedValue;
     } catch (error: unknown) {
+      if (error instanceof ZodError) {
+        console.log(error);
+        throw new BadRequestException(error.errors.map((err) => err.message));
+      }
       throw new BadRequestException('Validation failed');
     }
   }
