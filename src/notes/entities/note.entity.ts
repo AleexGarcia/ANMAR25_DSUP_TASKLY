@@ -1,5 +1,12 @@
 import { Task } from 'src/tasks/entities/task.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('notes')
 export class Note {
@@ -9,4 +16,8 @@ export class Note {
   task_id: Task;
   @Column({ nullable: false })
   content: string;
+  @CreateDateColumn()
+  created_at: Date;
+  @UpdateDateColumn()
+  updated_at: Date;
 }
