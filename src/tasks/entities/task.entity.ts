@@ -28,7 +28,7 @@ export class Task {
   priority: TaskPriority;
   @Column({ enum: TaskCategory, enumName: 'TaskCategory' })
   category: TaskCategory;
-  @OneToMany(() => Note, (note) => note.task_id)
+  @OneToMany(() => Note, (note) => note.task)
   notes: Note[];
   @CreateDateColumn()
   created_at: Date;
