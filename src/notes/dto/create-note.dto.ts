@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const createNoteSchema = z
   .object({
-    task_id: z.number(),
-    content: z.string(),
+    taskId: z.number(),
+    content: z.string().nonempty(),
   })
   .required();
 
