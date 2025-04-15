@@ -26,7 +26,11 @@ export class Task {
     default: TaskPriority.low,
   })
   priority: TaskPriority;
-  @Column({ enum: TaskCategory, enumName: 'TaskCategory' })
+  @Column({
+    enum: TaskCategory,
+    enumName: 'TaskCategory',
+    default: TaskCategory.bug_fixing,
+  })
   category: TaskCategory;
   @OneToMany(() => Note, (note) => note.task)
   notes: Note[];
