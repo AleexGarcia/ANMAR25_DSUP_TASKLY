@@ -1,26 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Note } from './entities/note.entity';
+import { Repository } from 'typeorm';
+import { Task } from 'src/tasks/entities/task.entity';
 
 @Injectable()
 export class NotesService {
-  create(createNoteDto: CreateNoteDto) {
-    return 'This action adds a new note';
+  constructor(
+    @InjectRepository(Note) private noteRepository: Repository<Note>,
+    @InjectRepository(Task) private taskRepository: Repository<Task>,
+  ) {}
+  async create(createNoteDto: CreateNoteDto) {
+    const { taskId, content } = createNoteDto;
+    const task = await this.taskRepository.findOne({ where: { id: taskId } });
+    if (!task) {
+      throw new NotFoundException('Task not found!');
+    }
+    return await this.noteRepository.save(new Note(task, content));
   }
 
-  findAll() {
-    return `This action returns all notes`;
+  async findAll(taskId: number) {
+    return this.noteRepository.find({
+      where: {
+        task: {
+          id: taskId,
+        },
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} note`;
+  async findOne(id: number) {
+    return this.noteRepository.findOne({ where: { id: id } });
   }
 
-  update(id: number, updateNoteDto: UpdateNoteDto) {
-    return `This action updates a #${id} note`;
+  async update(id: number, updateNoteDto: UpdateNoteDto) {
+    const note = await this.noteRepository.findOne({ where: { id: id } });
+    if (!note) throw new NotFoundException('Note not Found');
+    return this.noteRepository.update(
+      {
+        id: id,
+      },
+      { content: updateNoteDto.content },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} note`;
+  async remove(id: number) {
+    return this.noteRepository.delete({ id: id });
   }
 }
