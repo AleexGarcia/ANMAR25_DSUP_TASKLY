@@ -13,7 +13,7 @@ import {
 import { NotesService } from './notes.service';
 import { CreateNoteDto, createNoteSchema } from './dto/create-note.dto';
 import { UpdateNoteDto, updateNoteSchema } from './dto/update-note.dto';
-import { ZodValidationPipe } from 'src/zod-validation/zod-validation.pipe';
+import { ZodValidationPipe } from 'src/common/pipes/zod-validation/zod-validation.pipe';
 
 @Controller()
 export class NotesController {

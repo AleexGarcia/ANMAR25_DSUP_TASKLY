@@ -15,7 +15,7 @@ import { TasksService } from './tasks.service';
 import { CreateTaskDto, createTaskSchema } from './dto/create-task.dto';
 import { UpdateTaskDto, updateTaskSchema } from './dto/update-task.dto';
 import { TaskStatus } from 'src/common/enums/TaskStatus.enum';
-import { ZodValidationPipe } from 'src/zod-validation/zod-validation.pipe';
+import { ZodValidationPipe } from 'src/common/pipes/zod-validation/zod-validation.pipe';
 import { GetTaskQuery, getTaskQuerySchema } from './dto/get-task-query.dto';
 
 @Controller('tasks')
