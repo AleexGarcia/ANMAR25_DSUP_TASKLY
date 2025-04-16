@@ -14,9 +14,13 @@ import {
 import { TasksService } from './tasks.service';
 import { CreateTaskDto, createTaskSchema } from './dto/create-task.dto';
 import { UpdateTaskDto, updateTaskSchema } from './dto/update-task.dto';
-import { TaskStatus } from 'src/common/enums/TaskStatus.enum';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation/zod-validation.pipe';
+import { ZodValidationPipe } from '../common/pipes/zod-validation/zod-validation.pipe';
 import { GetTaskQuery, getTaskQuerySchema } from './dto/get-task-query.dto';
+import {
+  getTaskByStatusDto,
+  getTaskByStatusSchema,
+} from './dto/get-task-by-status.dto';
+import { paramIdSchema, ParamIdDto } from './dto/param-id.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -34,32 +38,44 @@ export class TasksController {
     return this.tasksService.findAll(query);
   }
 
+  @Get('/status/:status')
+  async findAllByStatus(
+    @Param(new ZodValidationPipe(getTaskByStatusSchema))
+    { status }: getTaskByStatusDto,
+  ) {
+    return this.tasksService.findAllByStatus(status);
+  }
+
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const task = await this.tasksService.findOne(+id);
+  async findOne(
+    @Param(new ZodValidationPipe(paramIdSchema)) { id }: ParamIdDto,
+  ) {
+    const task = await this.tasksService.findOne(id);
     if (!task) {
       throw new NotFoundException('Task not found');
     }
     return task;
   }
 
-  @Get('/status/:status')
-  async findAllByStatus(@Param('status') status: TaskStatus) {
-    return this.tasksService.findAllByStatus(status);
-  }
-
   @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param(new ZodValidationPipe(paramIdSchema)) { id }: ParamIdDto,
     @Body(new ZodValidationPipe(updateTaskSchema)) updateTaskDto: UpdateTaskDto,
   ) {
-    return this.tasksService.update(+id, updateTaskDto);
+    const updateResult = await this.tasksService.update(id, updateTaskDto);
+    if (updateResult && updateResult.affected === 0) {
+      throw new NotFoundException('Task not found');
+    }
+    const task = await this.findOne({ id });
+    return task;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
-    const deletedTask = await this.tasksService.remove(+id);
+  async remove(
+    @Param(new ZodValidationPipe(paramIdSchema)) { id }: ParamIdDto,
+  ) {
+    const deletedTask = await this.tasksService.remove(id);
     if (deletedTask && deletedTask.affected === 0) {
       throw new NotFoundException('Task not found');
     }
