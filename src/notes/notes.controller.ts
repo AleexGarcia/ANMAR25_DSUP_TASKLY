@@ -13,7 +13,8 @@ import {
 import { NotesService } from './notes.service';
 import { CreateNoteDto, createNoteSchema } from './dto/create-note.dto';
 import { UpdateNoteDto, updateNoteSchema } from './dto/update-note.dto';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation/zod-validation.pipe';
+import { ZodValidationPipe } from '../common/pipes/zod-validation/zod-validation.pipe';
+import { DeleteResult } from 'typeorm';
 
 @Controller()
 export class NotesController {
@@ -46,7 +47,7 @@ export class NotesController {
   @Delete('notes/:id')
   @HttpCode(204)
   async remove(@Param('id') id: string) {
-    const deleteResult = await this.notesService.remove(+id);
+    const deleteResult: DeleteResult = await this.notesService.remove(+id);
     if (deleteResult && deleteResult.affected === 0) {
       throw new NotFoundException('Note not Found');
     }
