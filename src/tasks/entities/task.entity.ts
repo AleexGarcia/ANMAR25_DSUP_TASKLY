@@ -1,7 +1,8 @@
-import { TaskCategory } from 'src/common/enums/TaskCategory.enum';
-import { TaskPriority } from 'src/common/enums/TaskPriority.enum';
-import { TaskStatus } from 'src/common/enums/TaskStatus.enum';
-import { Note } from 'src/notes/entities/note.entity';
+import { TaskStatus } from '../../common/enums/TaskStatus.enum';
+import { TaskPriority } from '../../common/enums/TaskPriority.enum';
+import { TaskCategory } from '../../common/enums/TaskCategory.enum';
+import { Note } from '../../notes/entities/note.entity';
+
 import {
   Column,
   CreateDateColumn,
@@ -14,6 +15,10 @@ import {
 export class Task {
   @PrimaryGeneratedColumn()
   id: number;
+  @Column()
+  title: string;
+  @Column()
+  description: string;
   @Column({
     enum: TaskStatus,
     enumName: 'TaskStatus',
