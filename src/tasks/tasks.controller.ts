@@ -7,7 +7,6 @@ import {
   Delete,
   Put,
   UsePipes,
-  NotFoundException,
   HttpCode,
   Query,
 } from '@nestjs/common';
@@ -50,11 +49,7 @@ export class TasksController {
   async findOne(
     @Param(new ZodValidationPipe(paramIdSchema)) { id }: ParamIdDto,
   ) {
-    const task = await this.tasksService.findOne(id);
-    if (!task) {
-      throw new NotFoundException('Task not found');
-    }
-    return task;
+    return await this.tasksService.findOne(id);
   }
 
   @Put(':id')
@@ -62,12 +57,7 @@ export class TasksController {
     @Param(new ZodValidationPipe(paramIdSchema)) { id }: ParamIdDto,
     @Body(new ZodValidationPipe(updateTaskSchema)) updateTaskDto: UpdateTaskDto,
   ) {
-    const updateResult = await this.tasksService.update(id, updateTaskDto);
-    if (updateResult && updateResult.affected === 0) {
-      throw new NotFoundException('Task not found');
-    }
-    const task = await this.findOne({ id });
-    return task;
+    return this.tasksService.update(id, updateTaskDto);
   }
 
   @Delete(':id')
@@ -75,9 +65,6 @@ export class TasksController {
   async remove(
     @Param(new ZodValidationPipe(paramIdSchema)) { id }: ParamIdDto,
   ) {
-    const deletedTask = await this.tasksService.remove(id);
-    if (deletedTask && deletedTask.affected === 0) {
-      throw new NotFoundException('Task not found');
-    }
+    await this.tasksService.remove(id);
   }
 }
