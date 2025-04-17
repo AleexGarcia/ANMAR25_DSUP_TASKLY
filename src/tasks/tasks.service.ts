@@ -1,49 +1,100 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
-import { Repository } from 'typeorm';
-import { TaskStatus } from 'src/common/enums/TaskStatus.enum';
+import { Like, Repository } from 'typeorm';
+import { TaskStatus } from '../common/enums/TaskStatus.enum';
 import { GetTaskQuery } from './dto/get-task-query.dto';
+import { Note } from '../notes/entities/note.entity';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task) private tasksRepository: Repository<Task>,
+    @InjectRepository(Note) private noteRepository: Repository<Note>,
   ) {}
   async create(createTaskDto: CreateTaskDto) {
     return this.tasksRepository.save(createTaskDto);
   }
 
   async findAll(query: GetTaskQuery) {
-    const whereOptional = {};
-    const { category, priority, status } = query;
-    if (category) {
-      Object.assign(whereOptional, { category: category });
+    const { category, priority, status, title, order, limit, page } = query;
+    const offset = (page - 1) * limit;
+    const findOptions = { take: limit, skip: offset };
+    if (order) {
+      Object.assign(findOptions, {
+        order: {
+          created_at: order,
+        },
+      });
     }
-    if (priority) {
-      Object.assign(whereOptional, { priority: priority });
+    if (category || priority || status || title) {
+      const whereOptional = {};
+      if (category) {
+        Object.assign(whereOptional, { category: category });
+      }
+      if (priority) {
+        Object.assign(whereOptional, { priority: priority });
+      }
+      if (status) {
+        Object.assign(whereOptional, { status: status });
+      }
+      if (title) {
+        Object.assign(whereOptional, { title: Like(`%${title}%`) });
+      }
+      Object.assign(findOptions, { where: whereOptional });
     }
-    if (status) {
-      Object.assign(whereOptional, { status: status });
-    }
-    return this.tasksRepository.find({ where: whereOptional });
+
+    const [tasks, count] = await this.tasksRepository.findAndCount(findOptions);
+
+    return this.responseFindAll(count, tasks, page);
   }
 
   async findOne(id: number) {
-    return this.tasksRepository.findOne({ where: { id: id } });
+    const findResult = await this.tasksRepository.findOne({
+      where: { id: id },
+      relations: ['notes'],
+    });
+
+    if (!findResult) {
+      throw new NotFoundException('Task not found');
+    }
+    return findResult;
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
-    return this.tasksRepository.update({ id: id }, updateTaskDto);
+    const updateResult = await this.tasksRepository.update(
+      { id: id },
+      updateTaskDto,
+    );
+    if (updateResult && updateResult.affected === 0) {
+      throw new NotFoundException('Task not found');
+    }
+    return this.findOne(id);
   }
 
   async remove(id: number) {
-    return this.tasksRepository.delete({ id: id });
+    const findTask = await this.findOne(id);
+    if (!findTask) {
+      throw new NotFoundException('Task not found');
+    }
+    if (findTask.notes.length > 0) {
+      await this.noteRepository.delete({ task: { id: findTask.id } });
+    }
+    const result = await this.tasksRepository.delete({ id: id });
+    return result;
   }
 
   async findAllByStatus(status: TaskStatus) {
     return this.tasksRepository.find({ where: { status: status } });
+  }
+
+  private responseFindAll(count: number, data: Task[], page: number) {
+    return {
+      page: page,
+      total: count,
+      tasks: data,
+    };
   }
 }
