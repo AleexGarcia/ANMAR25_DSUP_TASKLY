@@ -1,52 +1,17 @@
+import { enumWithMessages } from 'src/common/helpers/enumWithMessages';
 import { TaskCategory } from '../../common/enums/TaskCategory.enum';
 import { TaskPriority } from '../../common/enums/TaskPriority.enum';
 import { TaskStatus } from '../../common/enums/TaskStatus.enum';
 import { z } from 'zod';
 
 const validCategories = Object.values(TaskCategory).join(', ');
-const validStatuses = Object.values(TaskStatus).join(', ');
+const validStatus = Object.values(TaskStatus).join(', ');
 const validPriorities = Object.values(TaskPriority).join(', ');
 
 export const getTaskQuerySchema = z.object({
-  category: z
-    .nativeEnum(TaskCategory, {
-      errorMap: (issue) => {
-        if (issue.code === 'invalid_enum_value') {
-          return {
-            message: `Invalid category. Valid options are: ${validCategories}`,
-          };
-        }
-        return { message: 'Invalid category' };
-      },
-    })
-    .optional(),
-
-  priority: z
-    .nativeEnum(TaskPriority, {
-      errorMap: (issue) => {
-        if (issue.code === 'invalid_enum_value') {
-          return {
-            message: `Invalid priority. Valid options are: ${validPriorities}`,
-          };
-        }
-        return { message: 'Invalid priority' };
-      },
-    })
-    .optional(),
-
-  status: z
-    .nativeEnum(TaskStatus, {
-      errorMap: (issue) => {
-        if (issue.code === 'invalid_enum_value') {
-          return {
-            message: `Invalid status. Valid options are: ${validStatuses}`,
-          };
-        }
-        return { message: 'Invalid status' };
-      },
-    })
-    .optional(),
-
+  category: enumWithMessages(TaskCategory, validCategories).optional(),
+  status: enumWithMessages(TaskStatus, validStatus).optional(),
+  priority: enumWithMessages(TaskPriority, validPriorities).optional(),
   title: z
     .string({
       required_error: 'Title is required',
