@@ -49,8 +49,11 @@ export const getTaskQuerySchema = z.object({
 
   title: z
     .string({
+      required_error: 'Title is required',
       invalid_type_error: 'Title must be a string',
     })
+    .trim()
+    .nonempty('Title cannot be empty')
     .optional(),
 
   order: z
@@ -61,7 +64,7 @@ export const getTaskQuerySchema = z.object({
     })
     .optional(),
 
-  limit: z
+  limit: z.coerce
     .number({
       invalid_type_error: 'Limit must be a number',
     })
@@ -69,12 +72,13 @@ export const getTaskQuerySchema = z.object({
     .positive('Limit must be a positive number')
     .default(5),
 
-  page: z
+  page: z.coerce
     .number({
       invalid_type_error: 'Page must be a number',
     })
     .int('Page must be an integer')
     .positive('Page must be a positive number')
+    .min(1, 'Page must be greater than or equal to 1')
     .default(1),
 });
 
