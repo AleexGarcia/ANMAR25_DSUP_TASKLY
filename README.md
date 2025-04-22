@@ -1,98 +1,576 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# ANMAR25_DSUP_TASKLY
+## 📝 Project Description
+This is a task management application designed to help users organize and track their work more effectively. Unlike basic to-do lists, this app allows for detailed classification of each task, supporting:
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- Task categorization (e.g., bug fixing, feature development, documentation)
+- Setting priority levels (from low to critical)
+- Tracking status (to-do, in progress, done)
+- Adding custom notes for extra context on each task
 
-## Description
+Whether you're managing personal tasks or collaborating on software projects, this system provides a clear and flexible way to stay on top of your responsibilities.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## ⚙️ Environment:
+- **Node.js**: `v20.15.1`
+- **NestJS**: `11.0.1`
+- **TypeORM**: `0.3.22`
+- **SQLite3**: `5.1.7`
+- **Zod**: `3.24.2`
 
-## Project setup
+## 🛠️ Technologies Used
+- NestJS — Scalable and efficient Node.js framework
+- TypeScript — Strongly-typed JavaScript
+- TypeORM + SQLite — ORM and lightweight database for quick - development
+- ESLint + Prettier — Code quality and formatting
+- Zod — Runtime schema validation
 
+## 🚀 Installation
+Make sure you have Node.js and npm installed.
+### 1. Clone the repository
 ```bash
-$ npm install
+git clone https://github.com/AleexGarcia/ANMAR25_DSUP_TASKLY.git
+cd ANMAR25_DSUP_TASKLY
 ```
-
-## Compile and run the project
-
+### 2. Install dependencies
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
-
-## Run tests
-
+### 3. Run database migrations
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run migration:run
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### 4. Start the application
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:dev
 ```
+## 🌐 API Routes
+### Route: `/tasks`
+#### 1. Create Task
+- Endpoint: `POST /tasks`
+- Request Body:
+```json
+  {
+    "title": "Task title",
+    "description": "Task description",
+    "category": "bug_fixing",
+    "priority": "low",
+    "status": "todo"
+  }
+```
+- Responses:
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Status: `201 Created`
+```json
+  {
+    "id": 1,
+    "title": "Task title",
+    "description": "Task description",
+    "category": "bug_fixing",
+    "priority": "low",
+    "status": "todo",
+    "created_at": "2025-04-22T10:00:00Z",
+    "updated_at": "2025-04-22T10:00:00Z"
+  }
+```
+Status: `400 Bad Request`
+```json
+  {
+    "message": [
+        "category is required",
+        "Title is required",
+        "Description is required"
+    ],
+    "error": "Bad Request",
+    "statusCode": 400
+}
+```
+#### 2. Get Tasks
+- Endpoint: `GET /tasks`
+- Query Parameters:
+  - **category**: Optional, filter by category.
+  - **status**: Optional, filter by task status.
+  - **priority**: Optional, filter by task priority.
+  - **title**: Optional, search tasks by title.
+  - **order**: Optional, order by asc or desc.
+  - **limit**: Optional, limit the number of results (default: 5).
+  - **page**: Optional, specify the page number (default: 1).
+- Query URL:
+```plaintext
+GET /tasks?category=feature&status=todo&priority=low&title=example&order=asc&limit=5&page=1
+```
+- Responses:
 
-## Resources
+Status: `200 OK`
+```json
+{
+    "page": 1,
+    "total": 0,
+    "tasks": []
+}
+```
+Status: `200 OK`
+```json
+{
+    "page": 1,
+    "total": 21,
+    "tasks": [
+        {
+            "id": 2,
+            "title": "pp1",
+            "description": "pasdjk´paskdpasd",
+            "status": "todo",
+            "priority": "low",
+            "category": "feature",
+            "created_at": "2025-04-17T16:40:13.000Z",
+            "updated_at": "2025-04-17T16:40:13.000Z"
+        },
+        {
+            "id": 3,
+            "title": "pp2",
+            "description": "pasdjk´paskdpasd",
+            "status": "todo",
+            "priority": "low",
+            "category": "feature",
+            "created_at": "2025-04-17T16:40:20.000Z",
+            "updated_at": "2025-04-17T16:40:20.000Z"
+        },
+        {
+            "id": 4,
+            "title": "pp3",
+            "description": "pasdjk´paskdpasd",
+            "status": "todo",
+            "priority": "low",
+            "category": "feature",
+            "created_at": "2025-04-17T16:40:23.000Z",
+            "updated_at": "2025-04-17T16:40:23.000Z"
+        },
+        {
+            "id": 5,
+            "title": "pp4",
+            "description": "pasdjk´paskdpasd",
+            "status": "todo",
+            "priority": "low",
+            "category": "feature",
+            "created_at": "2025-04-17T16:40:25.000Z",
+            "updated_at": "2025-04-17T16:40:25.000Z"
+        },
+        {
+            "id": 6,
+            "title": "pp5",
+            "description": "pasdjk´paskdpasd",
+            "status": "todo",
+            "priority": "low",
+            "category": "feature",
+            "created_at": "2025-04-17T16:40:28.000Z",
+            "updated_at": "2025-04-17T16:40:28.000Z"
+        }
+    ]
+}
+```
+Status: `400 Bad Request`
+```json
+{
+    "message": [
+        "Invalid value. Valid category are: bug_fixing|feature|testing|documentation|refactoring|security|configuration_management|code_review|optimization",
+        "Invalid value. Valid status are: todo|in_progress|done",
+        "Invalid value. Valid priority are: low|medium|high|critical",
+        "Title cannot be empty",
+        "Order must be either 'asc' or 'desc'",
+        "Limit must be a positive number",
+        "Page must be a positive number",
+        "Page must be greater than or equal to 1"
+    ],
+    "error": "Bad Request",
+    "statusCode": 400
+}
+```
+#### 3. Get Task
+- Endpoint: `GET /tasks/:id`
+- Path Parameter:
+  - id: Task ID.
+- Responses:
+Status: `200 OK`
+```json
+{
+    "id": 17,
+    "title": "pp100",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "status": "todo",
+    "priority": "low",
+    "category": "feature",
+    "notes": [
+        {
+            "id": 7,
+            "content": "blablabla",
+            "created_at": "2025-04-17T16:54:04.000Z",
+            "updated_at": "2025-04-17T16:54:04.000Z"
+        }
+    ],
+    "created_at": "2025-04-17T16:40:48.000Z",
+    "updated_at": "2025-04-17T16:40:48.000Z"
+}
+```
+Status: `400 Bad Request`
+```json
+{
+  "message": [
+    "ID must be a number"
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+Status: `404 Not Found`
+```json
+{
+  "message": "Task not found",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+#### 4. Update Task
+- Endpoint: `PUT /tasks/:id`
+- Path Parameter:
+  - id: Task ID.
+- Request Body:
+```json
+  {
+    "title": "Task title",
+    "description": "Task description",
+    "category": "bug_fixing",
+    "priority": "low",
+    "status": "todo"
+  }
+```
+- Responses:
 
-Check out a few resources that may come in handy when working with NestJS:
+Status: `200 OK`
+```json
+{
+    "id": 15,
+    "title": "asdasdasd",
+    "description": "asdasdasd",
+    "status": "in_progress",
+    "priority": "medium",
+    "category": "bug_fixing",
+    "created_at": "2025-04-17T16:40:46.000Z",
+    "updated_at": "2025-04-22T14:58:26.000Z"
+}
+```
+Status: `400 Bad Request`
+```json
+{
+  "message": [
+    "category is required",
+    "status is required",
+    "priority is required",
+    "Title is required",
+    "Description is required",
+    "Invalid value. Valid category are: bug_fixing|feature|testing|documentation|refactoring|security|configuration_management|code_review|optimization",
+    "Invalid value. Valid status are: todo|in_progress|done",
+    "Invalid value. Valid priority are: low|medium|high|critical"
+  ],
+  "error": "Bad Request",
+   "statusCode": 400
+}
+```
+Status: `400 Bad Request`
+```json
+{
+  "message": [
+    "ID must be a number"
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+Status: `404 Not Found`
+```json
+{
+  "message": "Task not found",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+#### 5. Delete Task
+- Endpoint: `DELETE /tasks/:id`
+- Path Parameter:
+  - id: Task ID.
+- Responses:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Status: `204 No Content`
 
-## Support
+Status: `400 Bad Request`
+```json
+{
+  "message": [
+    "ID must be a number"
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+Status: `404 Not Found`
+```json
+{
+  "message": "Task not found",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+#### 6. Get Tasks by Status
+- Endpoint: `GET /tasks/status/:status`
+- Path Parameter:
+  - status: Task status. [todo, in_progress, done]
+- Responses:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Status: `200 OK`
+```json
+[
+  {
+    "id": 18,
+    "title": "teste",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "status": "done",
+    "priority": "high",
+    "category": "feature",
+    "created_at": "2025-04-17T16:40:49.000Z",
+    "updated_at": "2025-04-17T17:10:47.000Z"
+  },
+  {
+    "id": 23,
+    "title": "teste",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "status": "done",
+    "priority": "high",
+    "category": "feature",
+    "created_at": "2025-04-22T14:41:50.000Z",
+    "updated_at": "2025-04-22T14:41:50.000Z"
+  }
+]
+```
+Status: `200 OK`
+```json
+[]
+```
+Status: `400 Bad Request`
+```json
+{
+  "message": [
+    "Invalid value. Valid status are: todo|in_progress|done"
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+#### 7. Add Note for Task
+- Endpoint: `POST /tasks/:taskId/notes`
+- Path Parameter:
+  - taskId: Task ID.
+- Request Body:
+```json
+  {
+    "title": "Task title",
+    "description": "Task description",
+    "category": "bug_fixing",
+    "priority": "low",
+    "status": "todo"
+  }
+```
+- Responses:
 
-## Stay in touch
+Status: `200 OK`
+```json
+{
+  "id": 13,
+  "task": {
+    "id": 17,
+    "title": "pp100",
+    "description": "pasdjk´paskdpasd",
+    "status": "todo",
+    "priority": "low",
+    "category": "feature",
+    "created_at": "2025-04-17T16:40:48.000Z",
+    "updated_at": "2025-04-17T16:40:48.000Z"
+  },
+  "content": "adasdasd",
+  "created_at": "2025-04-22T16:33:44.000Z",
+  "updated_at": "2025-04-22T16:33:44.000Z"
+}
+```
+Status: `400 Bad Request`
+```json
+{
+    "message": [
+        "ID must be a number"
+    ],
+    "error": "Bad Request",
+    "statusCode": 400
+}
+```
+Status: `400 Bad Request`
+```json
+{
+  "message": [
+    "Content is required"
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+Status: `404 Not Found`
+```json
+{
+  "message": "Task not found!",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+#### 8. Get Notes by Task
+- Endpoint: `GET /tasks/:taskId/notes`
+- Path Parameter:
+  - taskId: Task ID.
+- Responses:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Status: `200 OK`
+```json
+[
+    {
+        "id": 7,
+        "content": "blablabla",
+        "created_at": "2025-04-17T16:54:04.000Z",
+        "updated_at": "2025-04-17T16:54:04.000Z",
+        "taskId": 17
+    },
+    {
+        "id": 13,
+        "content": "new content",
+        "created_at": "2025-04-22T16:33:44.000Z",
+        "updated_at": "2025-04-22T17:33:04.000Z",
+        "taskId": 17
+    }
+]
+```
+Status: `200 OK`
+```json
+[]
+```
+Status: `400 Bad Request`
+```json
+{
+    "message": [
+        "ID must be a number"
+    ],
+    "error": "Bad Request",
+    "statusCode": 400
+}
+```
+Status: `404 Not Found`
+```json
+{
+  "message": "Task not found!",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+### Route: `/notes`
+#### 1. Get Note
+- Endpoint: `GET /notes/:id`
+- Path Parameter:
+  - id: Note id.
+- Responses:
 
-## License
+Status: `200 OK`
+```json
+{
+  "id": 13,
+  "content": "adasdasd",
+  "created_at": "2025-04-22T16:33:44.000Z",
+  "updated_at": "2025-04-22T16:33:44.000Z",
+  "taskId": 17
+}
+```
+Status: `400 Bad Request`
+```json
+{
+  "message": [
+    "ID must be a number"
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+Status: `404 Not Found`
+```json
+{
+  "message": "Note not Found",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+#### 2. Update Note
+- Endpoint: `PUT /notes/:id`
+- Path Parameter:
+  - id: Note id.
+- Request Body:
+```json
+{
+  "content": "new content"
+}
+```
+- Responses:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Status: `200 OK`
+```json
+{
+  "id": 13,
+  "content": "new content",
+  "created_at": "2025-04-22T16:33:44.000Z",
+  "updated_at": "2025-04-22T17:30:34.000Z",
+  "taskId": 17
+}
+```
+Status: `400 Bad Request`
+```json
+{
+  "message": [
+    "ID must be a number"
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+Status: `404 Not Found`
+```json
+{
+  "message": "Note not Found",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+#### 3. Delete Note
+- Endpoint: `DELETE /notes/:id`
+- Path Parameter:
+  - id: Note id.
+- Responses:
+
+Status: `204 No Content`
+
+Status: `400 Bad Request`
+```json
+{
+  "message": [
+    "ID must be a number"
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+Status: `404 Not Found`
+```json
+{
+  "message": "Note not Found",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
