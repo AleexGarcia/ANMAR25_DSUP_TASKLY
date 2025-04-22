@@ -382,30 +382,21 @@ Status: `400 Bad Request`
 Status: `200 OK`
 ```json
 {
-  "id": 13,
-  "task": {
-    "id": 17,
-    "title": "pp100",
-    "description": "pasdjk´paskdpasd",
-    "status": "todo",
-    "priority": "low",
-    "category": "feature",
-    "created_at": "2025-04-17T16:40:48.000Z",
-    "updated_at": "2025-04-17T16:40:48.000Z"
-  },
-  "content": "adasdasd",
-  "created_at": "2025-04-22T16:33:44.000Z",
-  "updated_at": "2025-04-22T16:33:44.000Z"
+  "id": 17,
+  "content": "new content",
+  "created_at": "2025-04-22T18:08:03.000Z",
+  "updated_at": "2025-04-22T18:08:03.000Z",
+  "taskId": 17
 }
 ```
 Status: `400 Bad Request`
 ```json
 {
-    "message": [
-        "ID must be a number"
-    ],
-    "error": "Bad Request",
-    "statusCode": 400
+  "message": [
+    "ID must be a number"
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
 }
 ```
 Status: `400 Bad Request`
@@ -435,20 +426,20 @@ Status: `404 Not Found`
 Status: `200 OK`
 ```json
 [
-    {
-        "id": 7,
-        "content": "blablabla",
-        "created_at": "2025-04-17T16:54:04.000Z",
-        "updated_at": "2025-04-17T16:54:04.000Z",
-        "taskId": 17
-    },
-    {
-        "id": 13,
-        "content": "new content",
-        "created_at": "2025-04-22T16:33:44.000Z",
-        "updated_at": "2025-04-22T17:33:04.000Z",
-        "taskId": 17
-    }
+  {
+    "id": 7,
+    "content": "blablabla",
+    "created_at": "2025-04-17T16:54:04.000Z",
+    "updated_at": "2025-04-17T16:54:04.000Z",
+    "taskId": 17
+  },
+  {
+    "id": 13,
+    "content": "new content",
+    "created_at": "2025-04-22T16:33:44.000Z",
+    "updated_at": "2025-04-22T17:33:04.000Z",
+    "taskId": 17
+  }
 ]
 ```
 Status: `200 OK`
