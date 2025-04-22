@@ -54,6 +54,16 @@ export class TasksService {
   async findOne(id: number) {
     const findResult = await this.tasksRepository.findOne({
       where: { id: id },
+    });
+
+    if (!findResult) {
+      throw new NotFoundException('Task not found');
+    }
+    return findResult;
+  }
+  async findOneAndIncludeNotes(id: number) {
+    const findResult = await this.tasksRepository.findOne({
+      where: { id: id },
       relations: ['notes'],
     });
 
@@ -75,7 +85,7 @@ export class TasksService {
   }
 
   async remove(id: number) {
-    const findTask = await this.findOne(id);
+    const findTask = await this.findOneAndIncludeNotes(id);
     if (!findTask) {
       throw new NotFoundException('Task not found');
     }
