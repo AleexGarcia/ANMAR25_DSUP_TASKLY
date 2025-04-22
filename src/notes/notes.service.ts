@@ -25,19 +25,34 @@ export class NotesService {
   async findAll(taskId: number) {
     const task = await this.taskRepository.findOne({ where: { id: taskId } });
     if (!task) throw new NotFoundException('Task not Found!');
-    return this.noteRepository.find({
+    const notes = await this.noteRepository.find({
       where: {
         task: {
           id: taskId,
         },
       },
+      relations: {
+        task: true,
+      },
+      select: {
+        task: { id: true },
+      },
     });
+    return notes.map((note) => ({
+      ...note,
+      taskId: note.task.id,
+      task: undefined,
+    }));
   }
 
   async findOne(id: number) {
-    const note = await this.noteRepository.findOne({ where: { id: id } });
+    const note = await this.noteRepository.findOne({
+      where: { id: id },
+      relations: { task: true },
+      select: { task: { id: true } },
+    });
     if (!note) throw new NotFoundException('Note not Found');
-    return note;
+    return { ...note, taskId: note.task.id, task: undefined };
   }
 
   async update(id: number, updateNoteDto: UpdateNoteDto) {
