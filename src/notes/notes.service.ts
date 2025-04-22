@@ -17,9 +17,7 @@ export class NotesService {
     if (!task) {
       throw new NotFoundException('Task not found!');
     }
-    return await this.noteRepository.save(
-      new Note(task, createNoteDto.content),
-    );
+    return this.noteRepository.save(new Note(task, createNoteDto.content));
   }
 
   async findAll(taskId: number) {
