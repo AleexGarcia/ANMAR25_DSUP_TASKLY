@@ -4,9 +4,9 @@ import { TaskPriority } from '../../common/enums/TaskPriority.enum';
 import { TaskStatus } from '../../common/enums/TaskStatus.enum';
 import { z } from 'zod';
 
-const validCategories = Object.values(TaskCategory).join(', ');
-const validStatus = Object.values(TaskStatus).join(', ');
-const validPriorities = Object.values(TaskPriority).join(', ');
+const validCategories = Object.values(TaskCategory).join('|');
+const validStatus = Object.values(TaskStatus).join('|');
+const validPriorities = Object.values(TaskPriority).join('|');
 
 export const getTaskQuerySchema = z.object({
   category: enumWithMessages(TaskCategory, validCategories).optional(),
