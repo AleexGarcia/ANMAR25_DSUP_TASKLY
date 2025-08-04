@@ -1,5 +1,12 @@
 
 # ANMAR25_DSUP_TASKLY
+Task management system developed during the UOL Compass internship program as part of the ANMAR25_DSUP initiative.
+## 🗂 Branches
+
+- `legacy`: Original version delivered at the end of the internship. Preserved for historical comparison.
+- `main`: Latest and most stable version, including personal improvements.
+- `dev`: Development branch for upcoming features and changes.
+
 ## 📝 Project Description
 This is a task management application designed to help users organize and track their work more effectively. Unlike basic to-do lists, this app allows for detailed classification of each task, supporting:
 
