@@ -26,8 +26,7 @@ export class NotesService {
   }
 
   async findAll(taskId: number) {
-    const task = await this.tasksService.findOne(taskId);
-    if (!task) throw new NotFoundException('Task not Found!');
+    await this.tasksService.findOne(taskId);
     const notes = await this.noteRepository.find({
       where: {
         task: {
@@ -41,10 +40,9 @@ export class NotesService {
         task: { id: true },
       },
     });
-    return notes.map((note) => ({
-      ...note,
-      taskId: note.task.id,
-      task: undefined,
+    return notes.map<ResponseNoteDto>(({ task, ...rest }) => ({
+      ...rest,
+      taskId: task.id,
     }));
   }
 
@@ -55,7 +53,8 @@ export class NotesService {
       select: { task: { id: true } },
     });
     if (!note) throw new NotFoundException('Note not Found');
-    return { ...note, taskId: note.task.id, task: undefined };
+    const {task, ...rest} = note;
+    return { ...rest, taskId: task.id };
   }
 
   async update(id: number, updateNoteDto: UpdateNoteDto) {
