@@ -5,22 +5,27 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Note } from './entities/note.entity';
 import { Repository } from 'typeorm';
 import { Task } from '../tasks/entities/task.entity';
+import { ResponseNoteDto } from './dto/response-note.dto';
 
 @Injectable()
 export class NotesService {
   constructor(
     @InjectRepository(Note) private noteRepository: Repository<Note>,
     @InjectRepository(Task) private taskRepository: Repository<Task>,
-  ) {}
-  async create(taskId: number, createNoteDto: CreateNoteDto) {
-    const task = await this.taskRepository.findOne({ where: { id: taskId } });
-    if (!task) {
+  ) { }
+  async create(taskId: number, createNoteDto: CreateNoteDto): Promise<ResponseNoteDto> {
+    const findTask = await this.taskRepository.findOne({ where: { id: taskId } });
+    if (!findTask) {
       throw new NotFoundException('Task not found!');
     }
-    const note = await this.noteRepository.save(
-      new Note(task, createNoteDto.content),
+    const { task, ...rest } = await this.noteRepository.save(
+      new Note(findTask, createNoteDto.content),
     );
-    return { ...note, taskId: note.task.id, task: undefined };
+    const responseNote: ResponseNoteDto = {
+      ...rest,
+      taskId: task.id,
+    }
+    return responseNote;
   }
 
   async findAll(taskId: number) {

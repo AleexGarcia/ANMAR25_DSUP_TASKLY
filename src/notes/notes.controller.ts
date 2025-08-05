@@ -14,17 +14,18 @@ import { UpdateNoteDto, updateNoteSchema } from './dto/update-note.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation/zod-validation.pipe';
 import { ParamTaskIdDto, paramTaskIdSchema } from './dto/param-taskid-dto';
 import { ParamIdDto, paramIdSchema } from './dto/param-id.dto';
+import { ResponseNoteDto } from './dto/response-note.dto';
 
 @Controller()
 export class NotesController {
-  constructor(private readonly notesService: NotesService) {}
+  constructor(private readonly notesService: NotesService) { }
 
   @Post('tasks/:taskId/notes')
   async create(
     @Param(new ZodValidationPipe(paramTaskIdSchema)) { taskId }: ParamTaskIdDto,
     @Body(new ZodValidationPipe(createNoteSchema))
     createNoteDto: CreateNoteDto,
-  ) {
+  ): Promise<ResponseNoteDto> {
     return this.notesService.create(taskId, createNoteDto);
   }
 
@@ -55,6 +56,6 @@ export class NotesController {
   async remove(
     @Param(new ZodValidationPipe(paramIdSchema)) { id }: ParamIdDto,
   ) {
-    return this.notesService.remove(id);
+    await this.notesService.remove(id);
   }
 }
