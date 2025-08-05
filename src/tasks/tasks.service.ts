@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,7 +12,7 @@ import { NotesService } from '../notes/notes.service';
 export class TasksService {
   constructor(
     @InjectRepository(Task) private tasksRepository: Repository<Task>,
-    private notesService: NotesService,
+    @Inject(forwardRef(() => NotesService)) private notesService: NotesService,
   ) { }
   async create(createTaskDto: CreateTaskDto) {
     return this.tasksRepository.save(createTaskDto);
