@@ -1,23 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Note } from './entities/note.entity';
 import { Repository } from 'typeorm';
-import { Task } from '../tasks/entities/task.entity';
 import { ResponseNoteDto } from './dto/response-note.dto';
+import { TasksService } from '../tasks/tasks.service';
 
 @Injectable()
 export class NotesService {
   constructor(
     @InjectRepository(Note) private noteRepository: Repository<Note>,
-    @InjectRepository(Task) private taskRepository: Repository<Task>,
+    @Inject(forwardRef(() => TasksService)) private tasksService: TasksService,
   ) { }
   async create(taskId: number, createNoteDto: CreateNoteDto): Promise<ResponseNoteDto> {
-    const findTask = await this.taskRepository.findOne({ where: { id: taskId } });
-    if (!findTask) {
-      throw new NotFoundException('Task not found!');
-    }
+    const findTask = await this.tasksService.findOne(taskId);
     const { task, ...rest } = await this.noteRepository.save(
       new Note(findTask, createNoteDto.content),
     );
@@ -29,7 +26,7 @@ export class NotesService {
   }
 
   async findAll(taskId: number) {
-    const task = await this.taskRepository.findOne({ where: { id: taskId } });
+    const task = await this.tasksService.findOne(taskId);
     if (!task) throw new NotFoundException('Task not Found!');
     const notes = await this.noteRepository.find({
       where: {
@@ -75,5 +72,9 @@ export class NotesService {
   async remove(id: number) {
     await this.findOne(id);
     return this.noteRepository.delete({ id: id });
+  }
+
+  async removeNotesByTaskId(taskId: number) {
+    await this.noteRepository.delete({ task: { id: taskId } })
   }
 }

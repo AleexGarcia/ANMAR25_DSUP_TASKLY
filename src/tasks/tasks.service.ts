@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,14 +6,14 @@ import { Task } from './entities/task.entity';
 import { Like, Repository } from 'typeorm';
 import { TaskStatus } from '../common/enums/TaskStatus.enum';
 import { GetTaskQuery } from './dto/get-task-query.dto';
-import { Note } from '../notes/entities/note.entity';
+import { NotesService } from '../notes/notes.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task) private tasksRepository: Repository<Task>,
-    @InjectRepository(Note) private noteRepository: Repository<Note>,
-  ) {}
+    private notesService: NotesService,
+  ) { }
   async create(createTaskDto: CreateTaskDto) {
     return this.tasksRepository.save(createTaskDto);
   }
@@ -86,11 +86,8 @@ export class TasksService {
 
   async remove(id: number) {
     const findTask = await this.findOneAndIncludeNotes(id);
-    if (!findTask) {
-      throw new NotFoundException('Task not found');
-    }
     if (findTask.notes.length > 0) {
-      await this.noteRepository.delete({ task: { id: findTask.id } });
+      await this.notesService.removeNotesByTaskId(id);
     }
     const result = await this.tasksRepository.delete({ id: id });
     return result;
