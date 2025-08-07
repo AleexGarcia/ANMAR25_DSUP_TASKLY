@@ -49,7 +49,7 @@ export class TasksController {
   async findOne(
     @Param(new ZodValidationPipe(paramIdSchema)) { id }: ParamIdDto,
   ) {
-    return await this.tasksService.findOneAndIncludeNotes(id);
+    return this.tasksService.findOneAndIncludeNotes(id);
   }
 
   @Put(':id')
