@@ -35,7 +35,7 @@ export const getTaskQuerySchema = z.object({
     })
     .int('Limit must be an integer')
     .positive('Limit must be a positive number')
-    .default(5),
+    .optional(),
 
   page: z.coerce
     .number({
@@ -44,7 +44,7 @@ export const getTaskQuerySchema = z.object({
     .int('Page must be an integer')
     .positive('Page must be a positive number')
     .min(1, 'Page must be greater than or equal to 1')
-    .default(1),
+    .optional()
 });
 
 export type GetTaskQuery = z.infer<typeof getTaskQuerySchema>;

@@ -19,7 +19,9 @@ export class TasksService {
   }
 
   async findAll(query: GetTaskQuery) {
-    const { category, priority, status, title, order, limit, page } = query;
+    let { category, priority, status, title, order, limit, page } = query;
+    page = page ? page : 1;
+    limit = limit ? limit : 5;
     const offset = (page - 1) * limit;
     const findOptions = { take: limit, skip: offset };
     if (order) {
