@@ -49,6 +49,7 @@ describe('NotesService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
   describe('create', () => {
     it('should create a note when the task exists', async () => {
       const validTaskId = 1;
@@ -72,9 +73,16 @@ describe('NotesService', () => {
       const createdNote = new Note(assossietedTask, createNoteDto.content);
       const spyOnSave = jest.spyOn(noteRepository, 'save');
       spyOnSave.mockResolvedValueOnce(createdNote);
+      const { task, ...rest } = createdNote;
+      const responseNote = Object.assign(new ResponseNoteDto(), {
+        ...rest,
+        taskId: task.id,
+      })
 
       const result = await service.create(validTaskId, createNoteDto);
-      expect(result.taskId).toEqual(assossietedTask.id);
+
+      expect(result).toEqual(responseNote);
+      expect(result).toBeInstanceOf(ResponseNoteDto);
 
     });
 
@@ -128,7 +136,7 @@ describe('NotesService', () => {
       const noteId = 1;
       const note: Note = {
         id: 0,
-        task: new Task,
+        task: new Task('title', 'description', TaskCategory.bug_fixing),
         content: '',
         created_at: new Date(),
         updated_at: new Date()
@@ -140,7 +148,7 @@ describe('NotesService', () => {
     it('should throw NotFoundException if the note does not exist', async () => {
       const invalidNoteId = -1;
 
-      const spyOn = jest.spyOn(noteRepository, 'findOne').mockRejectedValueOnce(new NotFoundException)
+      const spyOn = jest.spyOn(noteRepository, 'findOne').mockResolvedValueOnce(null);
       expect(service.findOne(invalidNoteId)).rejects.toThrow(NotFoundException);
     });
   });
@@ -152,7 +160,7 @@ describe('NotesService', () => {
       }
       const note: Note = {
         id: 0,
-        task: new Task,
+        task: new Task('title', 'description', TaskCategory.bug_fixing),
         content: 'actual content',
         created_at: new Date(),
         updated_at: new Date()
@@ -184,7 +192,7 @@ describe('NotesService', () => {
       const noteId = 1;
       const note: Note = {
         id: 0,
-        task: new Task,
+        task: new Task('title', 'description', TaskCategory.bug_fixing),
         content: '',
         created_at: new Date,
         updated_at: new Date
@@ -205,4 +213,15 @@ describe('NotesService', () => {
       expect(service.findOne(invalidNoteId)).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe('removeNoteByTaskId', () => {
+    it('should delete a note by taskId', async () => {
+      const taskId = 1;
+      const spyOn = jest.spyOn(noteRepository, 'delete');
+      spyOn.mockResolvedValueOnce({ affected: 1 } as DeleteResult)
+      const result = await service.removeNotesByTaskId(taskId);
+      expect(spyOn).toHaveBeenCalledWith({ task: { id: taskId } });
+      expect(result.affected).toBeGreaterThan(0);
+    })
+  })
 });
