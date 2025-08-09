@@ -43,4 +43,11 @@ export class Task {
   created_at: Date;
   @UpdateDateColumn()
   updated_at: Date;
+  constructor(title: string, description: string, category: TaskCategory, status?: TaskStatus, priority?: TaskPriority) {
+    this.category = category;
+    this.title = title;
+    this.description = description;
+    this.status = status ? status : TaskStatus.todo;
+    this.priority = priority ? priority : TaskPriority.low;
+  }
 }
