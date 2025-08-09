@@ -33,7 +33,7 @@ describe('TasksService', () => {
         },
         {
           provide: NotesService,
-          useValue:{
+          useValue: {
             removeNotesByTaskId: jest.fn(),
           }
         }
@@ -60,7 +60,7 @@ describe('TasksService', () => {
       const spyOn = jest.spyOn(taskRepository, 'save');
       spyOn.mockResolvedValueOnce(newTask);
       const result = await service.create(createTaskDto);
-      expect(spyOn).toHaveBeenCalledWith(createTaskDto);
+      expect(spyOn).toHaveBeenCalledWith(newTask);
       expect(result).toEqual(newTask);
     })
     it('should throw an error if save fails', async () => {
@@ -69,10 +69,11 @@ describe('TasksService', () => {
         description: 'description',
         category: TaskCategory.bug_fixing,
       };
+      const newTask = new Task(createTaskDto.title, createTaskDto.description, createTaskDto.category);
       const spyOn = jest.spyOn(taskRepository, 'save');
       spyOn.mockRejectedValueOnce(new Error);
       await expect(service.create(createTaskDto)).rejects.toThrow();
-      expect(spyOn).toHaveBeenCalledWith(createTaskDto);
+      expect(spyOn).toHaveBeenCalledWith(newTask);
     })
   })
 
@@ -249,7 +250,7 @@ describe('TasksService', () => {
     });
 
     it('should throw NotFoundException when task does not exist', async () => {
-        const id = 1;
+      const id = 1;
       const task = new Task('title', 'description', TaskCategory.bug_fixing);
       task.id = 1;
       const findOneSpy = jest.spyOn(taskRepository, 'findOne');
@@ -263,11 +264,11 @@ describe('TasksService', () => {
     it('should return all tasks matching the given status', async () => {
       const status: TaskStatus = TaskStatus.in_progress;
       const tasksList: Task[] = []
-      const spy = jest.spyOn(taskRepository,'find');
+      const spy = jest.spyOn(taskRepository, 'find');
       spy.mockResolvedValueOnce(tasksList);
       const result = await service.findAllByStatus(status);
       expect(result).toEqual(tasksList);
-      expect(spy).toHaveBeenCalledWith({where: {status: status}});
+      expect(spy).toHaveBeenCalledWith({ where: { status: status } });
 
     });
   })
