@@ -3,7 +3,7 @@ import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Note } from './entities/note.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { ResponseNoteDto } from './dto/response-note.dto';
 import { TasksService } from '../tasks/tasks.service';
 
@@ -73,7 +73,7 @@ export class NotesService {
     return this.noteRepository.delete({ id: id });
   }
 
-  async removeNotesByTaskId(taskId: number) {
-    await this.noteRepository.delete({ task: { id: taskId } })
+  async removeNotesByTaskId(taskId: number): Promise<DeleteResult> {
+    return this.noteRepository.delete({ task: { id: taskId } })
   }
 }
