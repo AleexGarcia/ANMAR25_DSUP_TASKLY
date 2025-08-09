@@ -15,7 +15,9 @@ export class TasksService {
     @Inject(forwardRef(() => NotesService)) private notesService: NotesService,
   ) { }
   async create(createTaskDto: CreateTaskDto) {
-    return this.tasksRepository.save(createTaskDto);
+    const { title, description, category, status, priority } = createTaskDto;
+    const newTask = new Task(title, description, category, status, priority);
+    return this.tasksRepository.save(newTask);
   }
 
   async findAll(query: GetTaskQuery) {
@@ -88,7 +90,7 @@ export class TasksService {
 
   async remove(id: number) {
     const findTask = await this.findOneAndIncludeNotes(id);
-    if (findTask.notes.length > 0) {
+    if (findTask.notes && findTask.notes.length > 0) {
       await this.notesService.removeNotesByTaskId(id);
     }
     const result = await this.tasksRepository.delete({ id: id });
