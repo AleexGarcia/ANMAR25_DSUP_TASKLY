@@ -9,9 +9,9 @@ const validStatus = Object.values(TaskStatus).join('|');
 const validPriorities = Object.values(TaskPriority).join('|');
 
 export const getTaskQuerySchema = z.object({
-  category: enumWithMessages(TaskCategory, validCategories).optional(),
-  status: enumWithMessages(TaskStatus, validStatus).optional(),
-  priority: enumWithMessages(TaskPriority, validPriorities).optional(),
+  category: enumWithMessages(TaskCategory, validCategories, 'category').optional(),
+  status: enumWithMessages(TaskStatus, validStatus, 'status').optional(),
+  priority: enumWithMessages(TaskPriority, validPriorities, 'priority').optional(),
   title: z
     .string({
       required_error: 'Title is required',
@@ -22,11 +22,8 @@ export const getTaskQuerySchema = z.object({
     .optional(),
 
   order: z
-    .enum(['asc', 'desc'], {
-      errorMap: () => ({
-        message: "Order must be either 'asc' or 'desc'",
-      }),
-    })
+    .enum(['asc', 'desc'],
+      { message: "Order must be either 'asc' or 'desc'" })
     .optional(),
 
   limit: z.coerce

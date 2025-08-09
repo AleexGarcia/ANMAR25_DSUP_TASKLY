@@ -9,9 +9,9 @@ const validStatus = Object.values(TaskStatus).join('|');
 const validPriorities = Object.values(TaskPriority).join('|');
 
 export const createTaskSchema = z.object({
-  category: enumWithMessages(TaskCategory, validCategories),
-  status: enumWithMessages(TaskStatus, validStatus).optional(),
-  priority: enumWithMessages(TaskPriority, validPriorities).optional(),
+  category: enumWithMessages(TaskCategory, validCategories,'category'),
+  status: enumWithMessages(TaskStatus, validStatus,'status').optional(),
+  priority: enumWithMessages(TaskPriority, validPriorities,'priority').optional(),
   title: z
     .string({
       required_error: 'Title is required',
