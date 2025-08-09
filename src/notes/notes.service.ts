@@ -18,11 +18,10 @@ export class NotesService {
     const { task, ...rest } = await this.noteRepository.save(
       new Note(findTask, createNoteDto.content),
     );
-    const responseNote: ResponseNoteDto = {
+    return Object.assign(new ResponseNoteDto(),{
       ...rest,
       taskId: task.id,
-    }
-    return responseNote;
+    });
   }
 
   async findAll(taskId: number) {
@@ -46,7 +45,7 @@ export class NotesService {
     }));
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<ResponseNoteDto> {
     const note = await this.noteRepository.findOne({
       where: { id: id },
       relations: { task: true },
