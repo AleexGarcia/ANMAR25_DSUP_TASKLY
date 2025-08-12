@@ -24,12 +24,13 @@ const testOptions: DataSourceOptions = {
   type: 'postgres',
   host: process.env.TEST_DB_HOST || 'localhost',
   port: parseInt(process.env.TEST_DB_PORT || '5433'),
-  username: process.env.TEST_DB_USER || 'test_user',
-  password: process.env.TEST_DB_PASS || 'test_pass',
-  database: process.env.TEST_DB_NAME || 'test_db',
+  username: process.env.TEST_DB_USER || 'taskly_test_user',
+  password: process.env.TEST_DB_PASS || 'taskly_test_pass',
+  database: process.env.TEST_DB_NAME || 'taskly_test_db',
   dropSchema: true,
-  synchronize: true,
+  synchronize: false,
   logging: false,
+  migrationsRun: true,
   ...commonOptions,
 };
 
