@@ -28,7 +28,8 @@ describe('NotesService', () => {
             save: jest.fn(),
             find: jest.fn(),
             update: jest.fn(),
-            delete: jest.fn()
+            delete: jest.fn(),
+            findAndCount: jest.fn()
           }
         },
         {
@@ -74,15 +75,14 @@ describe('NotesService', () => {
       const spyOnSave = jest.spyOn(noteRepository, 'save');
       spyOnSave.mockResolvedValueOnce(createdNote);
       const { task, ...rest } = createdNote;
-      const responseNote = Object.assign(new ResponseNoteDto(), {
+      const responseNote: ResponseNoteDto = {
         ...rest,
         taskId: task.id,
-      })
+      };
 
       const result = await service.create(validTaskId, createNoteDto);
 
       expect(result).toEqual(responseNote);
-      expect(result).toBeInstanceOf(ResponseNoteDto);
 
     });
 
@@ -103,6 +103,7 @@ describe('NotesService', () => {
       const createNoteDto: CreateNoteDto = {
         content: 'valid content'
       }
+      const query = {};
       const assossietedTask: Task = {
         id: 1,
         title: 'Implement authentication',
@@ -118,17 +119,18 @@ describe('NotesService', () => {
       const arrNote: Note[] = []
       const expectArr: ResponseNoteDto[] = []
       taskServices.findOne.mockResolvedValueOnce(assossietedTask);
-      const spyOn = jest.spyOn(noteRepository, 'find').mockResolvedValueOnce(arrNote);
-      const result = await service.findAll(validTaskId);
+      const spyOn = jest.spyOn(noteRepository, 'findAndCount').mockResolvedValueOnce([arrNote, arrNote.length]);
+      const result = await service.findAll(validTaskId, query);
 
-      expect(result).toEqual(expectArr);
+      expect(result.notes).toEqual(expectArr);
 
     });
 
     it('should throw NotFoundException if the task does not exist', async () => {
       const invalidTaskId = -1;
+      const query = {};
       taskServices.findOne.mockRejectedValueOnce(new NotFoundException);
-      await expect(service.findAll(invalidTaskId)).rejects.toThrow(NotFoundException);
+      await expect(service.findAll(invalidTaskId, query)).rejects.toThrow(NotFoundException);
     });
   });
   describe('findOne', () => {

@@ -55,22 +55,23 @@ describe('NotesController', () => {
   describe('GET /tasks/:taskId/notes', () => {
     it('should return all notes for a valid task ID', async () => {
       const paramTaskId: ParamTaskIdDto = { taskId: 1 };
+      const query = {};
       const arrNotes: ResponseNoteDto[] = [{
-        taskId: 1,
         id: 1,
         content: 'note for task 1',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        taskId: 1,
       }, {
-        taskId: 2,
         id: 2,
-        content: 'note for task 2',
+        content: 'note for task 1',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        taskId: 1,
       }];
-      mockNotesService.findAll.mockResolvedValueOnce(arrNotes);
-      const result = await controller.findAll(paramTaskId);
-      expect(result).toEqual(arrNotes);
+      mockNotesService.findAll.mockResolvedValueOnce({ page: 1, total: arrNotes.length, notes: arrNotes });
+      const result = await controller.findAll(paramTaskId, query);
+      expect(result).toMatchObject({ page: 1, total: arrNotes.length, notes: arrNotes });
     });
 
   });
