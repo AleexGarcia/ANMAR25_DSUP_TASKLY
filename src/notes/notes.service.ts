@@ -6,6 +6,7 @@ import { Note } from './entities/note.entity';
 import { DeleteResult, Repository } from 'typeorm';
 import { ResponseNoteDto } from './dto/response-note.dto';
 import { TasksService } from '../tasks/tasks.service';
+import { GetNotesQueryDto } from './dto/get-notes-param.dto';
 
 @Injectable()
 export class NotesService {
@@ -18,15 +19,20 @@ export class NotesService {
     const { task, ...rest } = await this.noteRepository.save(
       new Note(findTask, createNoteDto.content),
     );
-    return Object.assign(new ResponseNoteDto(),{
-      ...rest,
-      taskId: task.id,
-    });
+    const responseNote: ResponseNoteDto = {
+      ...rest, taskId: task.id,
+    }
+
+    return responseNote;
   }
 
-  async findAll(taskId: number) {
+  async findAll(taskId: number, query: GetNotesQueryDto) {
     await this.tasksService.findOne(taskId);
-    const notes = await this.noteRepository.find({
+    let { limit, page } = query;
+    page = page ? page : 1;
+    limit = limit ? limit : 5;
+    const offset = (page - 1) * limit;
+    const [notes, count] = await this.noteRepository.findAndCount({
       where: {
         task: {
           id: taskId,
@@ -38,11 +44,17 @@ export class NotesService {
       select: {
         task: { id: true },
       },
+      take: limit,
+      skip: offset,
+      order: {
+        created_at: 'asc',
+      }
     });
-    return notes.map<ResponseNoteDto>(({ task, ...rest }) => ({
-      ...rest,
-      taskId: task.id,
-    }));
+    return {
+      page: page,
+      total: count,
+      notes: notes.map<ResponseNoteDto>(({ task, ...rest }) => ({ ...rest, taskId: task.id }))
+    }
   }
 
   async findOne(id: number): Promise<ResponseNoteDto> {
@@ -52,7 +64,7 @@ export class NotesService {
       select: { task: { id: true } },
     });
     if (!note) throw new NotFoundException('Note not Found');
-    const {task, ...rest} = note;
+    const { task, ...rest } = note;
     return { ...rest, taskId: task.id };
   }
 
