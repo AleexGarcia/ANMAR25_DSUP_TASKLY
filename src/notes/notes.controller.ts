@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto, createNoteSchema } from './dto/create-note.dto';
@@ -14,25 +15,28 @@ import { UpdateNoteDto, updateNoteSchema } from './dto/update-note.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation/zod-validation.pipe';
 import { ParamTaskIdDto, paramTaskIdSchema } from './dto/param-taskid-dto';
 import { ParamIdDto, paramIdSchema } from './dto/param-id.dto';
+import { ResponseNoteDto } from './dto/response-note.dto';
+import { GetNotesQueryDto, getNotesQuerySchema } from './dto/get-notes-param.dto';
 
 @Controller()
 export class NotesController {
-  constructor(private readonly notesService: NotesService) {}
+  constructor(private readonly notesService: NotesService) { }
 
   @Post('tasks/:taskId/notes')
   async create(
     @Param(new ZodValidationPipe(paramTaskIdSchema)) { taskId }: ParamTaskIdDto,
     @Body(new ZodValidationPipe(createNoteSchema))
     createNoteDto: CreateNoteDto,
-  ) {
+  ): Promise<ResponseNoteDto> {
     return this.notesService.create(taskId, createNoteDto);
   }
 
   @Get('tasks/:taskId/notes')
   async findAll(
     @Param(new ZodValidationPipe(paramTaskIdSchema)) { taskId }: ParamTaskIdDto,
+    @Query(new ZodValidationPipe(getNotesQuerySchema)) query: GetNotesQueryDto
   ) {
-    return this.notesService.findAll(taskId);
+    return this.notesService.findAll(taskId, query);
   }
 
   @Get('notes/:id')
@@ -55,6 +59,6 @@ export class NotesController {
   async remove(
     @Param(new ZodValidationPipe(paramIdSchema)) { id }: ParamIdDto,
   ) {
-    return this.notesService.remove(id);
+    await this.notesService.remove(id);
   }
 }

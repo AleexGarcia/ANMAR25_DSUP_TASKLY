@@ -1,4 +1,4 @@
-import { enumWithMessages } from 'src/common/helpers/enumWithMessages';
+import { enumWithMessages } from '../../common/helpers/enumWithMessages';
 import { TaskCategory } from '../../common/enums/TaskCategory.enum';
 import { TaskPriority } from '../../common/enums/TaskPriority.enum';
 import { TaskStatus } from '../../common/enums/TaskStatus.enum';
@@ -9,9 +9,9 @@ const validStatus = Object.values(TaskStatus).join('|');
 const validPriorities = Object.values(TaskPriority).join('|');
 
 export const getTaskQuerySchema = z.object({
-  category: enumWithMessages(TaskCategory, validCategories).optional(),
-  status: enumWithMessages(TaskStatus, validStatus).optional(),
-  priority: enumWithMessages(TaskPriority, validPriorities).optional(),
+  category: enumWithMessages(TaskCategory, validCategories, 'category').optional(),
+  status: enumWithMessages(TaskStatus, validStatus, 'status').optional(),
+  priority: enumWithMessages(TaskPriority, validPriorities, 'priority').optional(),
   title: z
     .string({
       required_error: 'Title is required',
@@ -22,11 +22,8 @@ export const getTaskQuerySchema = z.object({
     .optional(),
 
   order: z
-    .enum(['asc', 'desc'], {
-      errorMap: () => ({
-        message: "Order must be either 'asc' or 'desc'",
-      }),
-    })
+    .enum(['asc', 'desc'],
+      { message: "Order must be either 'asc' or 'desc'" })
     .optional(),
 
   limit: z.coerce
@@ -35,7 +32,7 @@ export const getTaskQuerySchema = z.object({
     })
     .int('Limit must be an integer')
     .positive('Limit must be a positive number')
-    .default(5),
+    .optional(),
 
   page: z.coerce
     .number({
@@ -44,7 +41,7 @@ export const getTaskQuerySchema = z.object({
     .int('Page must be an integer')
     .positive('Page must be a positive number')
     .min(1, 'Page must be greater than or equal to 1')
-    .default(1),
+    .optional()
 });
 
 export type GetTaskQuery = z.infer<typeof getTaskQuerySchema>;

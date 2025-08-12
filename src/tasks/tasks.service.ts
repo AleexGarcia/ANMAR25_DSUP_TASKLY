@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,20 +6,24 @@ import { Task } from './entities/task.entity';
 import { Like, Repository } from 'typeorm';
 import { TaskStatus } from '../common/enums/TaskStatus.enum';
 import { GetTaskQuery } from './dto/get-task-query.dto';
-import { Note } from '../notes/entities/note.entity';
+import { NotesService } from '../notes/notes.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task) private tasksRepository: Repository<Task>,
-    @InjectRepository(Note) private noteRepository: Repository<Note>,
-  ) {}
+    @Inject(forwardRef(() => NotesService)) private notesService: NotesService,
+  ) { }
   async create(createTaskDto: CreateTaskDto) {
-    return this.tasksRepository.save(createTaskDto);
+    const { title, description, category, status, priority } = createTaskDto;
+    const newTask = new Task(title, description, category, status, priority);
+    return this.tasksRepository.save(newTask);
   }
 
   async findAll(query: GetTaskQuery) {
-    const { category, priority, status, title, order, limit, page } = query;
+    let { category, priority, status, title, order, limit, page } = query;
+    page = page ? page : 1;
+    limit = limit ? limit : 5;
     const offset = (page - 1) * limit;
     const findOptions = { take: limit, skip: offset };
     if (order) {
@@ -86,11 +90,8 @@ export class TasksService {
 
   async remove(id: number) {
     const findTask = await this.findOneAndIncludeNotes(id);
-    if (!findTask) {
-      throw new NotFoundException('Task not found');
-    }
-    if (findTask.notes.length > 0) {
-      await this.noteRepository.delete({ task: { id: findTask.id } });
+    if (findTask.notes && findTask.notes.length > 0) {
+      await this.notesService.removeNotesByTaskId(id);
     }
     const result = await this.tasksRepository.delete({ id: id });
     return result;
