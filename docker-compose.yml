@@ -11,8 +11,10 @@ services:
       DB_NAME: ${DB_NAME}
       NODE_ENV: ${NODE_ENV}
     depends_on:
-      - postgres_taskly_prod
-
+      postgres_taskly_prod:
+        condition: service_healthy # Espera o healthcheck do banco passar
+    command: >
+      sh -c "npm run migration:prod && npm run start:prod"
   postgres_taskly_prod:
     image: postgres:15
     environment:
@@ -23,6 +25,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
+    healthcheck: # Comando que verifica se o Postgres já aceita conexões
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   postgres_taskly_test:
     image: postgres:15
@@ -35,7 +42,5 @@ services:
     tmpfs:
       - /var/lib/postgresql/data
 
-
 volumes:
   postgres_prod_data:
- 

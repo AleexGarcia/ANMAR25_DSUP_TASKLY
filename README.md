@@ -23,6 +23,8 @@ Whether you're managing personal tasks or collaborating on software projects, th
 - **TypeORM**: `0.3.22`
 - **SQLite3**: `5.1.7`
 - **Zod**: `3.24.2`
+- **Docker & Docker Compose**: `19.0.4`
+
 
 ## 🛠️ Technologies Used
 - NestJS — Scalable and efficient Node.js framework
@@ -31,25 +33,35 @@ Whether you're managing personal tasks or collaborating on software projects, th
 - ESLint + Prettier — Code quality and formatting
 - Zod — Runtime schema validation
 
-## 🚀 Installation
-Make sure you have Node.js and npm installed.
+## 🚀 Installation & Setup
+
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/AleexGarcia/ANMAR25_DSUP_TASKLY.git
 cd ANMAR25_DSUP_TASKLY
 ```
-### 2. Install dependencies
-```bash
-npm install
+
+### 2. Environment Configuration
+Create a `.env` file in the root directory of the project and define your configuration variables. For example:
+```env
+NODE_ENV=test
+
+DB_USER=root
+DB_PASS=sua_senha_aqui
+DB_NAME=taskly_db
+
+TEST_DB_USER=root
+TEST_DB_PASS=sua_senha_aqui
+TEST_DB_NAME=taskly_test_d
 ```
-### 3. Run database migrations
+
+### 3. Run with Docker & Docker Compose
+Make sure you have Docker and Docker Compose installed, then run the following command to build and start the application:
 ```bash
-npm run migration:run
+docker compose up --build
 ```
-### 4. Start the application
-```bash
-npm run start:dev
-```
+This command will handle installing dependencies, running database migrations, and spinning up the development environment automatically.
+
 ## 🌐 API Routes
 ### Route: `/tasks`
 #### 1. Create Task

@@ -26,9 +26,10 @@ RUN npm install --production --quiet --no-optional --no-fund --loglevel=error
 # Copia o build da stage builder
 COPY --from=builder /usr/src/api/dist ./dist
 
-# Copia o .env.production para dentro do container
-COPY --from=builder /usr/src/api/.env.production .env
+# Copia o .env para dentro do container
+COPY --from=builder /usr/src/api/.env .env
 
 EXPOSE 3000
+
 
 CMD ["node", "dist/main"]
